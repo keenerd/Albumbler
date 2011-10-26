@@ -53,15 +53,6 @@ def call(string):
     pipe = subprocess.PIPE
     return subprocess.call(string, stdout=pipe, shell=True)
 
-def port(number, message):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #sock.setblocking(0)
-    sock.connect(('localhost', number))
-    sock.send(message)
-    reply = sock.recv(16384)  # 16k ought to be more than enough for anyone
-    sock.close()
-    return reply
-
 def load_excludes():
     excludes = set()
     if not os.path.isfile(exclude_path):
@@ -300,9 +291,9 @@ def main():
     # but some don't template well
     player = conf['player']
     if player == 'mpd':
-        port(6600, 'clear\n')
-        port(6600, 'add "%s"\n' % strip_dirs(play, conf['music_paths']))
-        port(6600, 'play\n')
+        call('mpc clear\n')
+        call('mpc add "%s"\n' % strip_dirs(play, conf['music_paths']))
+        call('mpc play\n')
     if player == 'rhythmbox':
         call('rhythmbox-client --clear-queue')
         [call('rhythmbox-client --play-uri="%s"' % track) for track in list_files(play)]
