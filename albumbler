@@ -420,6 +420,10 @@ def play_bad_tunes(album):
         call('audtool --playlist-clear')
         [call('audtool --playlist-addurl "%s"' % track) for track in list_files(album)]
         call('audtool --playback-play')
+    if player == 'amarok':
+        call('for i in $(seq "$(qdbus org.kde.amarok /TrackList GetLength)"); do qdbus org.kde.amarok /TrackList DelTrack 0; done')
+        [call('qdbus org.kde.amarok /TrackList AddTrack "%s" false' % track) for track in list_files(album)]
+        call('qdbus org.kde.amarok /TrackList PlayTrack 0')
 
 def notify(message):
     if conf['notify'] == 'console':
