@@ -153,7 +153,7 @@ def list_files(path):
         return [j(dn, track) for track in  open(path).read().split('\n')]
     if not os.path.isdir(path):
         return ''
-    return [os.path.join(p,f) for p,d,files in os.walk(path) for f in files]
+    return sorted([os.path.join(p,f) for p,d,files in os.walk(path) for f in files])
 
 def strip_dirs(track, dirs):
     if type(track) != str:
@@ -420,6 +420,10 @@ def play_bad_tunes(album):
         call('audtool --playlist-clear')
         [call('audtool --playlist-addurl "%s"' % track) for track in list_files(album)]
         call('audtool --playback-play')
+    if player == 'amarok':
+        call('for i in $(seq "$(qdbus org.kde.amarok /TrackList GetLength)"); do qdbus org.kde.amarok /TrackList DelTrack 0; done')
+        [call('qdbus org.kde.amarok /TrackList AddTrack "%s" false' % track) for track in list_files(album)]
+        call('qdbus org.kde.amarok /TrackList PlayTrack 0')
 
 def notify(message):
     if conf['notify'] == 'console':
